@@ -1,4 +1,6 @@
 ﻿//库的调用
+
+#include<ostream>
 #include<iostream>
 #include<sstream>
 #include<string>
@@ -8,7 +10,10 @@
 #include<vector>
 #include <cstring>
 #include <fstream>
+#include "iomanip"
+#include "windows.h"
 using namespace std;
+#import "msado15.dll" no_namespace rename("EOF","EndOfFile")
 //Π的声明和定义
 const double pi = 2 * std::asin(1);
 //图形类的声明
@@ -21,6 +26,13 @@ class color {
 public:
 	unsigned char r, b, g;
 };
+template<class T>
+inline string toString(const T& v) {
+	ostringstream os;
+	os << v;
+	return os.str();
+}
+
 //抽象图形基类
 class shape {
 public:
@@ -33,7 +45,8 @@ public:
 	virtual float getArea() = 0;
 	virtual float getCir() = 0;
 	virtual bool isContain(point* p) = 0;
-
+	virtual int getcode() { return code; }
+	virtual int* getdata() { return 0; }
 	virtual void printType() = 0;
 	virtual void setbordercolor(int r, int b, int g) = 0;
 	virtual void setborderstyle(string bs) = 0;
@@ -64,6 +77,8 @@ public:
 		double dy = y - p.y;
 		return sqrt(dx * dx + dy * dy);
 	}
+	int getcode() { return code; }
+	int* getdata() { int* arr = new int[2] {x, y}; return arr; }
 	void setbordercolor(int r, int b, int g) {};
 	void setborderstyle(string bs) {};
 	void setfillcolor(int r, int b, int g) {};
@@ -100,7 +115,12 @@ public:
 
 	bool isContain(point* p) { return false; }
 	void printType() { cout << "this is a polyline." << endl; }
-
+	int getcode() { return code; }
+	int* getdata() {
+		int* arr = new int[2 * numPoints + 1];
+		arr[0] = numPoints;
+		for (int i = 0;i < numPoints - 1;i++) { arr[2 * i + 1] = points[i].x; arr[2 * i+2] = points[i].y; }
+						return arr; }
 	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; }
 	void setborderstyle(string bs) { this->borderstyle = bs; }
 	void setfillcolor(int r, int b, int g) {}
@@ -147,6 +167,13 @@ public:
 
 	}
 	void printType() { cout << "this is a polygon." << endl; }
+	int getcode() { return code; }
+	int* getdata() {
+		int* arr = new int[2 * numPoints + 1];
+		arr[0] = numPoints;
+		for (int i = 0;i < numPoints - 1;i++) { arr[2 * i + 1] = points[i].x; arr[2 * i + 2] = points[i].y; }
+		return arr;
+	}
 };
 
 //矩形类
@@ -183,6 +210,12 @@ public:
 	bool isContain(float X, float Y) {
 		return (X > min(p.x, q.x) && X <max(p.x, q.x) && Y>min(p.y, q.y) && Y < max(p.y, q.x));
 
+	}
+	int getcode() { return code; }
+	int* getdata() {
+		int* arr = new int[4] {p.x,p.y,q.x,q.y};
+
+		return arr;
 	}
 	void printType() { cout << "this is a rectangle." << endl; }
 	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
@@ -232,13 +265,17 @@ public:
 
 	}
 	void printType() { cout << "this is a circle." << endl; }
-
+	int getcode() { return code; }
+	int* getdata() {
+		int* arr = new int[3] {r,center.x,center.y};
+		return arr;
+	}
 	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
 	void setborderstyle(string bs) { borderstyle = bs; };
 	void setfillcolor(int r, int b, int g) { fillcolor.r = r; fillcolor.b = b;fillcolor.g = g; };
 	void setfillstlye(string fs) { fillstyle = fs; };
 };
-//三角形类
+
 class sector :public circle {
 
 
@@ -288,7 +325,11 @@ public:
 		double diff = diff1 + diff2;
 		return diff <= fabs(endAngle - startAngle) + 1e-8;
 	}
-
+	int getcode() { return code; }
+	int* getdata() {
+		int* arr = new int[3] {r, center.x, center.y};
+		return arr;
+	}
 	void printType() { cout << "this is a sector." << endl; }
 
 
@@ -392,39 +433,43 @@ private:
 
 class FileWriter {
 public:
-	virtual bool Write(const string& data, const string& filename) = 0;
+	virtual bool save(shape& sh) { return false; };
 };
 
 class pointFileWriter :
-	public FileWriter {
+	public FileWriter ,public point{
 public:
-	bool Write(const string& data, const string& filename) {}
-	bool save(point* p) {
-		ofstream fout("data.txt");
-		if (!fout) {
+	bool save(shape& p) {
+		
+		ofstream fout;
+		fout.open("tuxing.txt", ios::app);
+		if (!fout.is_open()){
 			cerr << "Error: cannot open file " << "data.txt" << endl;
 			return false;
 		}
-		fout << "point" << endl << p->code << endl << p->x << endl << p->y << endl;
+		else {
+			fout << "point" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl;
+			cout << "save dadadsuccessfully";
+			fout << flush;
 
-		return true;
+			fout.close();
+			return true;
+		}
 	}
 };
 //几何工厂类
 class savefactory {
 public:
-	static FileWriter* Create(shape* sh) {
-		int co = sh->code;
-		switch (co)
-				case(0): {return new pointFileWriter();
-
+	static FileWriter* Create(shape& sh) {
+		int co = sh.getcode(); 
+		switch (co) {
+		case(0): {return new pointFileWriter;}
+		default: return nullptr;
 		}
 
 	}
-
-
-	static void Destory(shape* Sh) {
-		Sh->~shape();
+	static void Destory(shape& Sh) {
+		Sh.~shape();
 
 	}
 
@@ -432,50 +477,11 @@ public:
 
 //主函数
 int main() {
-	point x(1, 1);
-	shape* g[3] = {
-	 Shapefactory::Create("Circle 0 0 1"),
-	 Shapefactory::Create("Triangle -1 -1 2 2 2 -2"),
-	 Shapefactory::Create("Rectangle 0 2 1 0")
-	};
-
-	cout << endl;
-	g[0]->printType();
-	cout << "The area of it is:" << g[0]->getArea() << endl;
-	cout << "The circumference of it is:" << g[0]->getCir() << endl;
-	if (g[0]->isContain(&x))cout << "The point in the Circle." << endl;
-	else cout << "The point not in the Circle." << endl;
-	g[0]->isInter(g[2]);
-	g[0]->isInter(g[1]);
-
-	cout << endl;
-	g[1]->printType();
-	cout << "The area of it is:" << g[1]->getArea() << endl;
-	cout << "The circumference of it is:" << g[1]->getCir() << endl;
-	if (g[0]->isContain(&x))cout << "The point in the Triangle." << endl;
-	else cout << "The point not in the Triangle." << endl;
-	g[1]->isInter(g[0]);
-	g[1]->isInter(g[2]);
-
-	cout << endl;
-	g[2]->printType();
-	cout << "The area of it is:" << g[2]->getArea() << endl;
-	cout << "The circumference of it is:" << g[2]->getCir() << endl;
-	if (g[0]->isContain(&x))cout << "The point in the Rectangle." << endl;
-	else cout << "The point not in the Rectangle." << endl;
-	g[2]->isInter(g[0]);
-	g[2]->isInter(g[1]);
-
-	cout << endl;
-	Shapefactory::Destory(g[0]);
-	Shapefactory::Destory(g[1]);
-	Shapefactory::Destory(g[2]);
-
-	cout << endl;
-	vector<string> vec;
-	Getxt("D:\\Visual Studiofile\\SXnum2\\geometry_data.txt", vec);
-	int n = vec.size();
-	for (int i = 0; i < n; i++)Shapefactory::Create(vec[i]);
-	cout << "A total of " << n << " graphics were produced." << endl;
-
+	point p=point(3, 1);
+	FileWriter* sa=savefactory::Create(p);
+	sa->save(p);
+	point q = point(19, 26);
+	FileWriter* ka = savefactory::Create(q);
+	ka->save(q);
+	return 0;
 }
