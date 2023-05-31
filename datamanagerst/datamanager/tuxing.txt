@@ -1,6 +1,8 @@
-point
-0
-3 1
-point
-0
+polyline
+1
+2
 19 26
+3 1
+1,2,3
+window
+

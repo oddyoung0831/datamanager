@@ -24,7 +24,7 @@ class Rectangle;
 class Triangle;
 class color {
 public:
-	unsigned char r, b, g;
+	string r, g, b;
 };
 template<class T>
 inline string toString(const T& v) {
@@ -45,20 +45,21 @@ public:
 	virtual float getArea() = 0;
 	virtual float getCir() = 0;
 	virtual bool isContain(point* p) = 0;
-	virtual int getcode() { return code; }
-	virtual int* getdata() { return 0; }
+	virtual int getcode() = 0;
+	virtual double* getdata() = 0;
+	virtual string* getdraw() =0;
 	virtual void printType() = 0;
-	virtual void setbordercolor(int r, int b, int g) = 0;
-	virtual void setborderstyle(string bs) = 0;
-	virtual void setfillcolor(int r, int b, int g) = 0;
-	virtual void setfillstlye(string fs) = 0;
+	virtual void setbc(string r, string g, string b) = 0;
+	virtual void setbs(string bs) = 0;
+	virtual void setfc(string r, string g, string b) = 0;
+	virtual void setfs(string fs) = 0;
 };
 shape::~shape() {}
 //点类
 class point : public shape {
 public:
 	int code = 0;
-	int x, y;
+	double x, y;
 	point() {}
 	point(const point& p) { x = p.x; y = p.y; }
 	point(float X, float Y) :x(X), y(Y) {}
@@ -78,11 +79,12 @@ public:
 		return sqrt(dx * dx + dy * dy);
 	}
 	int getcode() { return code; }
-	int* getdata() { int* arr = new int[2] {x, y}; return arr; }
-	void setbordercolor(int r, int b, int g) {};
-	void setborderstyle(string bs) {};
-	void setfillcolor(int r, int b, int g) {};
-	void setfillstlye(string fs) {};
+	double* getdata() { double* arr = new double[2] {x, y}; return arr; }
+	string* getdraw() { return 0; }
+	void setbc(string r, string g, string b) {};
+	void setbs(string bs) {};
+	void setfc(string r, string g, string b) {};
+	void setfs(string fs) {};
 };
 //线类
 class polyline :public shape {
@@ -116,15 +118,19 @@ public:
 	bool isContain(point* p) { return false; }
 	void printType() { cout << "this is a polyline." << endl; }
 	int getcode() { return code; }
-	int* getdata() {
-		int* arr = new int[2 * numPoints + 1];
+	double* getdata() {
+		double* arr = new double[2 * numPoints + 5];
 		arr[0] = numPoints;
-		for (int i = 0;i < numPoints - 1;i++) { arr[2 * i + 1] = points[i].x; arr[2 * i+2] = points[i].y; }
+		for (int i = 0;i < numPoints;i++) { arr[2 * i + 1] = points[i].x; arr[2 * i+2] = points[i].y; }
 						return arr; }
-	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; }
-	void setborderstyle(string bs) { this->borderstyle = bs; }
-	void setfillcolor(int r, int b, int g) {}
-	void setfillstlye(string fs) {}
+	string* getdraw() {
+		string* str = new string[8]{ bordercolor.r ,bordercolor.g ,bordercolor.b,borderstyle};
+		return str;
+	}
+	void setbc(string r, string g, string b) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; }
+	void setbs(string bs) { this->borderstyle = bs; }
+	void setfc(string r, string g, string b) {}
+	void setfs(string fs) {}
 };
 
 class polygon : public polyline {
@@ -168,12 +174,14 @@ public:
 	}
 	void printType() { cout << "this is a polygon." << endl; }
 	int getcode() { return code; }
-	int* getdata() {
-		int* arr = new int[2 * numPoints + 1];
-		arr[0] = numPoints;
-		for (int i = 0;i < numPoints - 1;i++) { arr[2 * i + 1] = points[i].x; arr[2 * i + 2] = points[i].y; }
-		return arr;
+	string* getdraw() {
+		string* str = new string[8]{ bordercolor.r ,bordercolor.g ,bordercolor.b,borderstyle,
+										fillcolor.r, fillcolor.g, fillcolor.b,fillstyle };
+		return str;
 	}
+	void setfc(string r, string g, string b) { fillcolor.r = r;fillcolor.g = g;fillcolor.b = b;
+	}
+	void setfs(string fs) { this->fillstyle = fs; }
 };
 
 //矩形类
@@ -183,7 +191,7 @@ public:
 	point p;
 	point q;
 	rectangle() {}
-	rectangle(float X, float Y, float X1, float Y1) :p(X, Y), q(X1, Y1) { if (X == X1 && Y == Y1) { assert(false); } }
+	rectangle(double X, double Y, double X1, double Y1) :p(X, Y), q(X1, Y1) { if (X == X1 && Y == Y1) { assert(false); } }
 	rectangle(const point& p, const point& Q) : p(p), q(Q) { if (p.x == q.x && p.y == q.y) { assert(false); } }
 	rectangle(const rectangle& r) {
 		p = r.p;
@@ -212,16 +220,21 @@ public:
 
 	}
 	int getcode() { return code; }
-	int* getdata() {
-		int* arr = new int[4] {p.x,p.y,q.x,q.y};
+	double* getdata() {
+		double* arr = new double[4] {p.x,p.y,q.x,q.y};
 
 		return arr;
 	}
+	string* getdraw() {
+		string* str = new string[8]{ bordercolor.r ,bordercolor.g ,bordercolor.b,borderstyle,
+										fillcolor.r, fillcolor.g, fillcolor.b,fillstyle };
+		return str;
+	}
 	void printType() { cout << "this is a rectangle." << endl; }
-	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
-	void setborderstyle(string bs) { borderstyle = bs; };
-	void setfillcolor(int r, int b, int g) { fillcolor.r = r; fillcolor.b = b;fillcolor.g = g; };
-	void setfillstlye(string fs) { fillstyle = fs; };
+	void setbc(string r, string g, string b) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
+	void setbs(string bs) { borderstyle = bs; };
+	void setfc(string r, string g, string b) { fillcolor.r = r; fillcolor.b = b;fillcolor.g = g; };
+	void setfs(string fs) { fillstyle = fs; };
 };
 //圆形类
 class circle :public shape {
@@ -230,10 +243,10 @@ class circle :public shape {
 public:
 	int code = 4;
 	point center;
-	int r;
+	double r;
 	circle() {}
-	circle(float X, float Y, float R) :center(X, Y), r(R) { if (R == 0) { assert(false); } }
-	circle(const point& p, float R) : center(p), r(R) { if (R == 0) { assert(false); } }
+	circle(double X, double Y, double R) :center(X, Y), r(R) { if (R == 0) { assert(false); } }
+	circle(const point& p, double R) : center(p), r(R) { if (R == 0) { assert(false); } }
 	circle(const circle& c) {
 		center = c.center;
 		r = c.r;
@@ -266,14 +279,19 @@ public:
 	}
 	void printType() { cout << "this is a circle." << endl; }
 	int getcode() { return code; }
-	int* getdata() {
-		int* arr = new int[3] {r,center.x,center.y};
+	double* getdata() {
+		double* arr = new double[3] {r,center.x,center.y};
 		return arr;
 	}
-	void setbordercolor(int r, int b, int g) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
-	void setborderstyle(string bs) { borderstyle = bs; };
-	void setfillcolor(int r, int b, int g) { fillcolor.r = r; fillcolor.b = b;fillcolor.g = g; };
-	void setfillstlye(string fs) { fillstyle = fs; };
+	string* getdraw() {
+		string* str = new string[8]{ bordercolor.r ,bordercolor.g ,bordercolor.b,borderstyle,
+										fillcolor.r, fillcolor.g, fillcolor.b,fillstyle };
+		return str;
+	}
+	void setbc(string r, string g, string b) { bordercolor.r = r; bordercolor.b = b;bordercolor.g = g; };
+	void setbs(string bs) { borderstyle = bs; };
+	void setfc(string r, string g, string b) { fillcolor.r = r; fillcolor.b = b;fillcolor.g = g; };
+	void setfs(string fs) { fillstyle = fs; };
 };
 
 class sector :public circle {
@@ -326,8 +344,8 @@ public:
 		return diff <= fabs(endAngle - startAngle) + 1e-8;
 	}
 	int getcode() { return code; }
-	int* getdata() {
-		int* arr = new int[3] {r, center.x, center.y};
+	double* getdata() {
+			double* arr = new double[5] {r, center.x, center.y,startAngle,endAngle};
 		return arr;
 	}
 	void printType() { cout << "this is a sector." << endl; }
@@ -430,14 +448,62 @@ private:
 	int height_;           // 图像高度
 	vector<unsigned char> data_;  // 存储像素数据
 };
+class Writer {
+public:
+	virtual bool  save(shape& sh) = 0;
+};
+class SqlWriter:
+public Writer{
+public:
+	virtual bool save(shape& sh) { return false; }
+};
+class pointSqlWriter:
+	public SqlWriter{
+	bool save(shape& sh) {
+		::CoInitialize(NULL);
+		_RecordsetPtr m_pRecordset("ADODB.Recordset");
+		_ConnectionPtr m_pConnection("ADODB.Connection");
+		_bstr_t bstrSQL("select * from point");
+		try
+		{
+			m_pConnection.CreateInstance("ADODB.Connection");
+			_bstr_t strConnect = "Provider=SQLOLEDB;Server=(local);Database=tuxing;uid=sa;pwd=20030831;";
+			m_pConnection->Open(strConnect, "", "", adModeUnknown);
+			if (m_pConnection == NULL)
+			{
+				cerr << "Lind data ERROR!\n";
+			}
+			//创建记录集
+			m_pRecordset.CreateInstance(_uuidof(Recordset));
+			//取得表中的记录
+			m_pRecordset->Open(bstrSQL, m_pConnection.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+			
+			m_pRecordset->AddNew(); ///添加新记录
+			m_pRecordset->PutCollect("x", _variant_t(sh.getdata()[0]));
+			m_pRecordset->PutCollect("y", _variant_t(sh.getdata()[1]));
+			m_pRecordset->Update();
+			m_pRecordset->Close(); // 关闭记录集
+		}
+		// 捕捉异常
+		catch (_com_error c)
+		{
+			cerr << "\nERROR:" << (char*)c.Description();
+		}
+		if (m_pConnection->State)
+			m_pConnection->Close();
 
-class FileWriter {
+		::CoUninitialize();
+		return TRUE;
+	}
+};
+class FileWriter :
+public Writer{
 public:
 	virtual bool save(shape& sh) { return false; };
 };
 
 class pointFileWriter :
-	public FileWriter ,public point{
+	public FileWriter {
 public:
 	bool save(shape& p) {
 		
@@ -448,8 +514,63 @@ public:
 			return false;
 		}
 		else {
-			fout << "point" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl;
-			cout << "save dadadsuccessfully";
+			fout << "point" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl<<endl;
+			cout << "save successfully";
+			fout << flush;
+
+			fout.close();
+			return true;
+		}
+	}
+};
+class polylineFileWriter :
+	public FileWriter {
+public:
+	bool save(shape& p) {
+		ofstream fout;
+		fout.open("tuxing.txt", ios::app);
+		if (!fout.is_open()) {
+			cerr << "Error: cannot open file " << "data.txt" << endl;
+			return false;
+		}
+		else {
+			fout << "polyline" << endl << toString(p.getcode()) << endl<<toString(p.getdata()[0])<<endl;
+			for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
+				fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1])<<endl;
+			for (int k = 0;k < 4;k++) 
+			{ 
+				if (k < 2)fout << p.getdraw()[k] << ",";
+				else fout << p.getdraw()[k] << endl;
+				
+			}
+	
+							
+			
+			fout << endl;
+			cout << "save successfully"<<endl;
+			fout << flush;
+			
+			fout.close();
+			return true;
+		}
+	}
+};
+class polygonFileWriter :
+	public FileWriter {
+public:
+	bool save(shape& p) {
+		ofstream fout;
+		fout.open("tuxing.txt", ios::app);
+		if (!fout.is_open()) {
+			cerr << "Error: cannot open file " << "data.txt" << endl;
+			return false;
+		}
+		else {
+			fout << "polygon" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl;
+			for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
+				fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1]) << endl;
+			fout << endl;
+			cout << "save successfully"<<endl;
 			fout << flush;
 
 			fout.close();
@@ -460,13 +581,29 @@ public:
 //几何工厂类
 class savefactory {
 public:
-	static FileWriter* Create(shape& sh) {
-		int co = sh.getcode(); 
-		switch (co) {
-		case(0): {return new pointFileWriter;}
-		default: return nullptr;
-		}
+	static Writer* Create(shape& sh, string t) {
+		int co = sh.getcode();
+		if (t == "t" || t == "T") {
+			switch (co) {
+			case(0): {return new pointFileWriter;}
+			case(1): {return new polylineFileWriter;}
+			case(2): {return new polygonFileWriter;}
+			case(3): {return new pointFileWriter;}
+			case(4): {return new pointFileWriter;}
+			case(5): {return new pointFileWriter;}
+			default: cout << "error:unknown type";return nullptr;
+			}
 
+		}
+		else if (t == "s" || t == "S") {
+			switch (co) {
+			case(0): {return new pointSqlWriter;}
+			default: cout << "error:unknown type";return nullptr;
+
+			}
+
+		}
+		else return nullptr;
 	}
 	static void Destory(shape& Sh) {
 		Sh.~shape();
@@ -477,11 +614,14 @@ public:
 
 //主函数
 int main() {
+	
 	point p=point(3, 1);
-	FileWriter* sa=savefactory::Create(p);
-	sa->save(p);
 	point q = point(19, 26);
-	FileWriter* ka = savefactory::Create(q);
-	ka->save(q);
+	point* ps = new point[2]{q,p};
+	polyline pl(ps, 2);
+	pl.setbc("1","2","3");
+	pl.setbs("window");
+	Writer* ka = savefactory::Create(pl,"t");
+	ka->save(pl);
 	return 0;
 }
