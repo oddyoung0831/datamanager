@@ -1,3 +1,6 @@
+point
+0
+3 1
 polyline
 1
 2
@@ -5,4 +8,92 @@ polyline
 3 1
 1,2,3
 window
+polygon
+2
+2
+19 26
+3 1
+1,2,3
+window
+4,5,6
+soild
+
+rectangle
+3
+19 26
+3
+ 1
+,,
+
+,,
+
+
+circle
+4
+10
+3 1
+,,
+
+,,
+
+
+sector
+5
+10
+3 1
+0.785398
+2.35619
+,,
+
+,,
+
+
+point
+0
+3 1
+polyline
+1
+2
+19 26
+3 1
+1,2,3
+window
+polygon
+2
+2
+19 26
+3 1
+1,2,3
+window
+4,5,6
+soild
+
+rectangle
+3
+19 26
+3 1
+,,
+
+,,
+
+
+circle
+4
+10
+3 1
+,,
+
+,,
+
+
+sector
+5
+10
+3 1
+0.785398
+2.35619
+,,
+
+,,
+
 

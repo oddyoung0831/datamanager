@@ -1,19 +1,19 @@
 ﻿  datamanager.cpp
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(115,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(146,14): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(154,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(194,60): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(194,57): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(194,70): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(194,66): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(207,25): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(211,12): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(248,50): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(248,47): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(261,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(265,17): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(269,17): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(320,19): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(323,28): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
-C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(326,16): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(116,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(147,14): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(155,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(195,60): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(195,57): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(195,70): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(195,66): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(208,25): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(212,12): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(249,50): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(249,47): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(262,10): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(266,17): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(270,17): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(322,19): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(325,28): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(328,16): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
   datamanager.vcxproj -> C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\x64\Debug\datamanager.exe

@@ -79,7 +79,8 @@ public:
 		return sqrt(dx * dx + dy * dy);
 	}
 	int getcode() { return code; }
-	double* getdata() { double* arr = new double[2] {x, y}; return arr; }
+	double* getdata() { double* arr = new double[2] {x, y}; return arr;delete[] arr; }
+	
 	string* getdraw() { return 0; }
 	void setbc(string r, string g, string b) {};
 	void setbs(string bs) {};
@@ -198,7 +199,7 @@ public:
 		q = r.q;
 
 	}
-	~rectangle() { cout << "A rectangle has been destroyed." << endl; };
+	~rectangle() {};
 	point& getPoint() {
 		return p, q;
 
@@ -252,7 +253,7 @@ public:
 		r = c.r;
 
 	}
-	~circle() { cout << "A circle has been destroyed." << endl; };
+	~circle() {};
 	point& getPoint() {
 		return this->center;
 
@@ -302,9 +303,10 @@ public:
 	double startAngle;
 	double endAngle;
 	sector() {}
-	sector(double r, point c, double sa, double ea) :circle(c, r) {
-		startAngle = sa;
-		endAngle = ea;
+	sector(point c, double r, double sa, double ea) :circle(c, r) {
+		startAngle = sa * pi/ 180.0;
+		endAngle = ea * pi / 180.0;
+		
 	}
 	sector(const sector& t) {
 		center = t.center;
@@ -312,7 +314,7 @@ public:
 		startAngle = t.startAngle;
 		endAngle = t.endAngle;
 	}
-	~sector() { cout << "A Sector has been destroyed." << endl; };
+	~sector() {};
 	point& getPoint() {
 		return this->center;
 	}
@@ -455,10 +457,17 @@ public:
 class SqlWriter:
 public Writer{
 public:
+	virtual _variant_t* itemarr(shape& p) { _variant_t* arr= new _variant_t[1]; return arr; };
+	virtual _variant_t* dataarr(shape& p) { _variant_t* arr=new _variant_t[1]; return arr; };
+	virtual void codeout(shape& p, ofstream& fout) {};
 	virtual bool save(shape& sh) { return false; }
 };
-class pointSqlWriter:
+class RSqlWriter:
 	public SqlWriter{
+	int itemnum;
+	_variant_t* itemarr(shape& p);
+	_variant_t* dataarr(shape& p);
+	void getitenum(shape& p);
 	bool save(shape& sh) {
 		::CoInitialize(NULL);
 		_RecordsetPtr m_pRecordset("ADODB.Recordset");
@@ -479,8 +488,10 @@ class pointSqlWriter:
 			m_pRecordset->Open(bstrSQL, m_pConnection.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
 			
 			m_pRecordset->AddNew(); ///添加新记录
-			m_pRecordset->PutCollect("x", _variant_t(sh.getdata()[0]));
-			m_pRecordset->PutCollect("y", _variant_t(sh.getdata()[1]));
+			getitenum(sh);
+			for(int i=0;i<itemnum;i++)
+				m_pRecordset->PutCollect(itemarr(sh)[i], dataarr(sh)[i]);
+			cout << "save successfully" << endl;
 			m_pRecordset->Update();
 			m_pRecordset->Close(); // 关闭记录集
 		}
@@ -496,15 +507,42 @@ class pointSqlWriter:
 		return TRUE;
 	}
 };
+_variant_t* RSqlWriter::itemarr(shape& p) {
+	_variant_t* arr = new _variant_t[2];
+	switch (p.getcode()) {
+	case 0: {
+			arr[0] = "x";
+			arr[1] = "y";break;}
+	}
+	return arr;
+};
+_variant_t* RSqlWriter::dataarr(shape& p) {
+	_variant_t* arr = new _variant_t[2];
+	switch (p.getcode()) {
+	case 0: {
+		arr[0] = _variant_t(p.getdata()[0]);
+		arr[1] = _variant_t(p.getdata()[1]);break;}
+	}
+	return arr;
+}
+void RSqlWriter::getitenum(shape& p) {
+	switch (p.getcode()) {
+	case 0:itemnum = 2;break;
+	default: {cout << "error:unknown tuxing"<<endl;assert(false);}
+	}
+}
 class FileWriter :
 public Writer{
 public:
+	virtual void codeout(shape& p, ofstream& fout) {};
 	virtual bool save(shape& sh) { return false; };
+	
 };
 
-class pointFileWriter :
+class RFileWriter :
 	public FileWriter {
 public:
+	void codeout(shape& p,ofstream& fout);
 	bool save(shape& p) {
 		
 		ofstream fout;
@@ -514,96 +552,72 @@ public:
 			return false;
 		}
 		else {
-			fout << "point" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl<<endl;
-			cout << "save successfully";
-			fout << flush;
+			codeout(p,fout);
+			if (p.getcode() > 1)
+			{
+				int kg = 1;
+				for (int k = 0;k < 8;k++)
+				{
 
-			fout.close();
-			return true;
-		}
-	}
-};
-class polylineFileWriter :
-	public FileWriter {
-public:
-	bool save(shape& p) {
-		ofstream fout;
-		fout.open("tuxing.txt", ios::app);
-		if (!fout.is_open()) {
-			cerr << "Error: cannot open file " << "data.txt" << endl;
-			return false;
-		}
-		else {
-			fout << "polyline" << endl << toString(p.getcode()) << endl<<toString(p.getdata()[0])<<endl;
-			for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
-				fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1])<<endl;
-			for (int k = 0;k < 4;k++) 
-			{ 
-				if (k < 2)fout << p.getdraw()[k] << ",";
-				else fout << p.getdraw()[k] << endl;
-				
+					if (kg > 0)fout << p.getdraw()[k] << ",";
+					else fout << p.getdraw()[k] << endl;
+					if ((k + 3) % 2 == 0) kg = -kg;
+				}
 			}
-	
-							
+				fout << endl;
+				cout << "save successfully" << endl;
+				fout << flush;
+				fout.close();
+				return true;
 			
-			fout << endl;
-			cout << "save successfully"<<endl;
-			fout << flush;
-			
-			fout.close();
-			return true;
 		}
 	}
 };
-class polygonFileWriter :
-	public FileWriter {
-public:
-	bool save(shape& p) {
-		ofstream fout;
-		fout.open("tuxing.txt", ios::app);
-		if (!fout.is_open()) {
-			cerr << "Error: cannot open file " << "data.txt" << endl;
-			return false;
-		}
-		else {
-			fout << "polygon" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl;
-			for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
-				fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1]) << endl;
-			fout << endl;
-			cout << "save successfully"<<endl;
-			fout << flush;
+void RFileWriter::codeout(shape& p,ofstream& fout)
+{
+	switch (p.getcode()) {
+	case(0): {fout << "point" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl;
+		break;}
+	case(1): {fout << "polyline" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl;
+		for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
+			fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1]) << endl;
+		for (int k = 0;k < 4;k++)
+		{
+			if (k < 2)fout << p.getdraw()[k] << ",";
+			else fout << p.getdraw()[k] << endl;
 
-			fout.close();
-			return true;
-		}
+		}break;}
+	case(2): {fout << "polygon" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl;
+		for (int i = 1;i < 2 * p.getdata()[0] + 1;i += 2)
+			fout << toString(p.getdata()[i]) << " " << toString(p.getdata()[i + 1]) << endl;
+		break;}
+	case(3): {fout << "rectangle" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << " " << toString(p.getdata()[1]) << endl
+		<< toString(p.getdata()[2]) << " " << toString(p.getdata()[3]) << endl;
+		break;}
+	case(4): {fout << "circle" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl << toString(p.getdata()[1]) << " "
+		<< toString(p.getdata()[2]) << endl;
+		break;}
+	case(5): {fout << "sector" << endl << toString(p.getcode()) << endl << toString(p.getdata()[0]) << endl << toString(p.getdata()[1]) << " "
+		<< toString(p.getdata()[2]) << endl << toString(p.getdata()[3]) << endl << toString(p.getdata()[4]) << endl;
+		break;}
+	default: {cout << "error:unknown tuxing";assert(false);}
 	}
-};
+}
+	
 //几何工厂类
 class savefactory {
 public:
-	static Writer* Create(shape& sh, string t) {
-		int co = sh.getcode();
-		if (t == "t" || t == "T") {
-			switch (co) {
-			case(0): {return new pointFileWriter;}
-			case(1): {return new polylineFileWriter;}
-			case(2): {return new polygonFileWriter;}
-			case(3): {return new pointFileWriter;}
-			case(4): {return new pointFileWriter;}
-			case(5): {return new pointFileWriter;}
-			default: cout << "error:unknown type";return nullptr;
-			}
+	static Writer* Create(string tp) {
+		if(tp=="t"||tp=="T")
+			return new RFileWriter;
+		else if(tp=="s"||tp=="S") 
+			return new RSqlWriter; 
+		else { cout << "error:unknown type" << endl;return nullptr; }
 
-		}
-		else if (t == "s" || t == "S") {
-			switch (co) {
-			case(0): {return new pointSqlWriter;}
-			default: cout << "error:unknown type";return nullptr;
+			
 
-			}
-
-		}
-		else return nullptr;
+		
+		
 	}
 	static void Destory(shape& Sh) {
 		Sh.~shape();
@@ -617,11 +631,26 @@ int main() {
 	
 	point p=point(3, 1);
 	point q = point(19, 26);
-	point* ps = new point[2]{q,p};
+	/*point* ps = new point[2]{q,p};
 	polyline pl(ps, 2);
+	polygon pg(ps, 2);
+	rectangle ra(q, p);
+	circle cc(p, 10);
+	sector st(p, 10, 45, 135);
 	pl.setbc("1","2","3");
 	pl.setbs("window");
-	Writer* ka = savefactory::Create(pl,"t");
+	pg.setbc("1", "2", "3");
+	pg.setbs("window");
+	pg.setfc("4", "5", "6");
+	pg.setfs("soild");
+	Writer* ka = savefactory::Create("t");
+	ka->save(p);
 	ka->save(pl);
+	ka->save(pg);
+	ka->save(ra);
+	ka->save(cc);
+	ka->save(st);*/
+	Writer* ka = savefactory::Create("s");
+	ka->save(p);
 	return 0;
 }
