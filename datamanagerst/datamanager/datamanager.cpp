@@ -457,22 +457,22 @@ public:
 class SqlWriter:
 public Writer{
 public:
-	virtual _variant_t* itemarr(shape& p) { _variant_t* arr= new _variant_t[1]; return arr; };
-	virtual _variant_t* dataarr(shape& p) { _variant_t* arr=new _variant_t[1]; return arr; };
 	virtual void codeout(shape& p, ofstream& fout) {};
 	virtual bool save(shape& sh) { return false; }
+	virtual double* xydata(shape& p) { double* arr = new double[0];return arr; }
 };
 class RSqlWriter:
 	public SqlWriter{
-	int itemnum;
-	_variant_t* itemarr(shape& p);
-	_variant_t* dataarr(shape& p);
-	void getitenum(shape& p);
+	int hangnum;
+	char* gettable(shape& p);
+	double* xydata(shape& p);
 	bool save(shape& sh) {
 		::CoInitialize(NULL);
+		
 		_RecordsetPtr m_pRecordset("ADODB.Recordset");
 		_ConnectionPtr m_pConnection("ADODB.Connection");
-		_bstr_t bstrSQL("select * from point");
+		_bstr_t bstrSQL(gettable(sh));
+		
 		try
 		{
 			m_pConnection.CreateInstance("ADODB.Connection");
@@ -483,14 +483,45 @@ class RSqlWriter:
 				cerr << "Lind data ERROR!\n";
 			}
 			//创建记录集
+
 			m_pRecordset.CreateInstance(_uuidof(Recordset));
 			//取得表中的记录
 			m_pRecordset->Open(bstrSQL, m_pConnection.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
 			
-			m_pRecordset->AddNew(); ///添加新记录
-			getitenum(sh);
-			for(int i=0;i<itemnum;i++)
-				m_pRecordset->PutCollect(itemarr(sh)[i], dataarr(sh)[i]);
+			_variant_t vsnum;
+			int count=0;
+			while(!m_pRecordset->EndOfFile)
+			{
+				vsnum = m_pRecordset->GetCollect("number");//这儿给字段编号和字段名都可以 
+				if(count<(int)vsnum)count = vsnum;
+				m_pRecordset->MoveNext();
+			}
+			
+				
+			for (int i = 0;i < hangnum;i++) {
+				m_pRecordset->AddNew();
+					m_pRecordset->PutCollect("number", _variant_t(count + 1));
+					m_pRecordset->PutCollect("x", _variant_t(xydata(sh)[2*i]));
+					m_pRecordset->PutCollect("y", _variant_t(xydata(sh)[2*i+1]));
+					if (sh.getcode() > 0) {
+
+						string str =sh.getdraw()[0]+"," + sh.getdraw()[1] +"," + sh.getdraw()[2];
+						const char* bc = str.c_str();
+						string str1 = sh.getdraw()[3];
+						const char* bs = str1.c_str();
+						m_pRecordset->PutCollect("bordercolor", _variant_t(bc));
+						m_pRecordset->PutCollect("borderstyle", _variant_t(bs));
+					}
+					if (sh.getcode() > 1) {
+						string str = sh.getdraw()[4] + "," + sh.getdraw()[5] + "," + sh.getdraw()[6];
+						const char* fc = str.c_str();
+						string str1 = sh.getdraw()[7];
+						const char* fs = str1.c_str();
+						m_pRecordset->PutCollect("fillcolor", _variant_t(fc));
+						m_pRecordset->PutCollect("fillstyle", _variant_t(fs));
+					}
+				}
+			
 			cout << "save successfully" << endl;
 			m_pRecordset->Update();
 			m_pRecordset->Close(); // 关闭记录集
@@ -507,27 +538,21 @@ class RSqlWriter:
 		return TRUE;
 	}
 };
-_variant_t* RSqlWriter::itemarr(shape& p) {
-	_variant_t* arr = new _variant_t[2];
+double* RSqlWriter::xydata(shape& p) {
+	double* arr = new double[11];
 	switch (p.getcode()) {
-	case 0: {
-			arr[0] = "x";
-			arr[1] = "y";break;}
+	case 0: {arr[0] = p.getdata()[0];arr[1] = p.getdata()[1];return arr;break;}
+	case 1:case 2: {for (int i = 0;i < hangnum;i++) {
+		arr[2 * i] = p.getdata()[2 * i + 1];arr[2 * i + 1] = p.getdata()[2 * i + 2];
+		}return arr;break;}
+	default: {cout << "error:unknown tuxing" << endl;assert(false);}
 	}
-	return arr;
-};
-_variant_t* RSqlWriter::dataarr(shape& p) {
-	_variant_t* arr = new _variant_t[2];
-	switch (p.getcode()) {
-	case 0: {
-		arr[0] = _variant_t(p.getdata()[0]);
-		arr[1] = _variant_t(p.getdata()[1]);break;}
-	}
-	return arr;
 }
-void RSqlWriter::getitenum(shape& p) {
+char* RSqlWriter::gettable(shape& p) {
 	switch (p.getcode()) {
-	case 0:itemnum = 2;break;
+	case 0:{hangnum = 1;return "select * from point";break;}
+	case 1: {hangnum = p.getdata()[0];return "select * from polyline";break;}
+	case 2: {hangnum = p.getdata()[0];return "select * from polygon";break;}
 	default: {cout << "error:unknown tuxing"<<endl;assert(false);}
 	}
 }
@@ -631,18 +656,14 @@ int main() {
 	
 	point p=point(3, 1);
 	point q = point(19, 26);
-	/*point* ps = new point[2]{q,p};
+	point* ps = new point[2]{q,p};
 	polyline pl(ps, 2);
 	polygon pg(ps, 2);
-	rectangle ra(q, p);
+	/*rectangle ra(q, p);
 	circle cc(p, 10);
 	sector st(p, 10, 45, 135);
-	pl.setbc("1","2","3");
-	pl.setbs("window");
-	pg.setbc("1", "2", "3");
-	pg.setbs("window");
-	pg.setfc("4", "5", "6");
-	pg.setfs("soild");
+	
+	
 	Writer* ka = savefactory::Create("t");
 	ka->save(p);
 	ka->save(pl);
@@ -650,7 +671,13 @@ int main() {
 	ka->save(ra);
 	ka->save(cc);
 	ka->save(st);*/
-	Writer* ka = savefactory::Create("s");
-	ka->save(p);
+	pg.setbc("1", "2", "3");
+	pg.setbs("window");
+	pg.setfc("4", "5", "6");
+	pg.setfs("soild");
+	pl.setbc("1", "2", "3");
+	pl.setbs("window");
+	Writer* sa = savefactory::Create("s");
+	sa->save(pg);
 	return 0;
 }

@@ -16,4 +16,9 @@ C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datama
 C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(322,19): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
 C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(325,28): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
 C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(328,16): warning C4244: “return”: 从“double”转换到“float”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(554,34): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(555,34): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(550): warning C4715: “RSqlWriter::xydata”: 不是所有的控件路径都返回值
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(558): warning C4715: “RSqlWriter::gettable”: 不是所有的控件路径都返回值
+C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\datamanager\datamanager.cpp(175): warning C4715: “polygon::isContain”: 不是所有的控件路径都返回值
   datamanager.vcxproj -> C:\Users\ODDYOUNG\Desktop\面向对象大作业\datamanager\datamanagerst\x64\Debug\datamanager.exe
